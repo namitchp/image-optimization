@@ -1,6 +1,5 @@
 import express from 'express';
 import cors from 'cors';
-import { createServer } from 'http';
 import { ffmpeg } from './ffmpeg.js';
 import { imageOptimizationFun} from './imageOptimizer.js';
 const app = express();
