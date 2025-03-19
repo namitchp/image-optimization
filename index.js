@@ -20,8 +20,8 @@ app.get('/', function (req, res) {
   });
 imageOptimizationFun(app);
 ffmpeg(app);
-app.listen(8085, function () {
-  console.log('App is listening at port 8085...');
+app.listen(8001, function () {
+  console.log('App is listening at port 8001...');
 });
 
 
