@@ -6,11 +6,7 @@ import fs from 'fs';
 import { exec } from 'child_process';
 import { Server } from 'socket.io';
 import { promisify } from 'util';
-
 const execPromise = promisify(exec);
-
-const db = './db.json';
-
 export const ffmpeg = (app, server) => {
   const io = new Server(server, { cors: { origin: '*' } });
   const storage = multer.diskStorage({
@@ -45,20 +41,7 @@ export const ffmpeg = (app, server) => {
       );
     },
   });
-  app.get('/video_list', function (req, res) {
-    fs.readFile(db, 'utf8', async function (err, data) {
-      if (err) throw err;
-      const list = JSON.parse(data);
-      if (list) {
-        res.json({ list, message: 'Data Fetch Successfully', valid: true });
-      } else {
-        res.json({ message: 'Data Not Found', valid: false });
-      }
-    });
-  });
-  app.get('/', function (req, res) {
-    res.json({ message: 'Streaming' });
-  });
+
   app.post('/v0/video/upload',upload.single('file'),async function (req, res) {
       const lessonId = req.file.filename.split('.')[0];
       const videoPath = req.file.path;

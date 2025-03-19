@@ -15,16 +15,34 @@ app.use(express.urlencoded({ extended: false }));
 //     methods: ['GET', 'POST'],
 //   })
 // );
-app.get('/login', (req, res) => {
-  const token = jwt.sign({ _id: 'asdasjdhkasdasdas' }, secretKeyJWT);
-  res
-    .cookie('token',token, { httpOnly: true, secure: true, sameSite: 'none' })
-    .json({
-      message: 'Login Success',
-    });
-});
+app.get('/', function (req, res) {
+    res.json({ message: 'Streaming and Image Optimization' });
+  });
 imageOptimizationFun(app);
 ffmpeg(app);
-app.listen(8001, function () {
+app.listen(8085, function () {
   console.log('App is listening at port 8085...');
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
