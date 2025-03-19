@@ -1,5 +1,4 @@
 import multer from 'multer';
-import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
 import fs from 'fs';
 import { exec } from 'child_process';
@@ -9,8 +8,8 @@ const execPromise = promisify(exec);
 export const ffmpeg = (app, server) => {
   const io = new Server(server, { cors: { origin: '*' } });
 
-  const UPLOAD_DIR = './uploads/video/original';
-  const STREAM_DIR = './uploads/video/stream';
+  const UPLOAD_DIR = 'uploads/video/original';
+  const STREAM_DIR = 'uploads/video/stream';
   const MAX_SEGMENT_SIZE = 4 * 1024 * 1024; // 4 MB
 
   const storage = multer.diskStorage({
