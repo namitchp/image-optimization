@@ -53,7 +53,7 @@ export const ffmpeg = (app, server) => {
       const maxSegmentSize = 4 * 1024 * 1024; // 4 MB
       const ffmpegCommand = `ffmpeg -i ${videoPath} -codec:v libx264 -codec:a aac -hls_time 20 -hls_playlist_type vod -hls_segment_filename "${outputPath}/segment%03d.ts" -start_number 0 -flush_packets 1 -fs ${maxSegmentSize} -progress pipe:1 ${hlsPath}`;
       const ffmpegProcess = exec(ffmpegCommand);
-      const fullUrl = `${req.protocol}://${req.get('host')}/${hlsPath}`;
+      const fullUrl = `${req.protocol}://${req.headers.host}/${hlsPath}`;
       res.json({
         message: 'Video converted to HLS format',
         videoUrl: fullUrl,

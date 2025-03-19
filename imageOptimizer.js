@@ -173,7 +173,7 @@ export const imageOptimizationFun = (app) => {
     },
     classOptimization.imageUpload().single('file'),
     (req, res) => {
-      const fullUrl = `${req.protocol}://${req.get('host')}/v0/image/get?name=${
+      const fullUrl = `${req.protocol}://${req.headers.host}/v0/image/get?name=${
         req.file.path.split("original/")[1]
       }&format=auto&width=auto&height=auto&quality=auto`;
       res.status(200).json({
