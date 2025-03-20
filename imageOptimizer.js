@@ -3,7 +3,6 @@ import sharp from 'sharp';
 import * as fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-
 class imageOptimizer {
   imageUpload() {
     const fileSize = 20; // Max file size in MB
@@ -31,14 +30,12 @@ class imageOptimizer {
       },
     });
   }
-
   imageGet(query, res) {
     const imagePath = this.fileAccess(query, res);
     return imagePath.valid
       ? this.transformedImageFun(imagePath.message, res)
       : this.originalImage(query, imagePath, res);
   }
-
   async originalImage(query, imagePath, res) {
     const { width, height, quality, format } = query;
     const formatOptions = {
