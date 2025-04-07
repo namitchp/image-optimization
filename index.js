@@ -46,7 +46,6 @@ app.get('/metrics', async (_req, res) => {
     res.status(500).end(err);
   }
 });
-
 const reqResTime = new Histogram({
   name: 'http_req_res_time_bucket_ImageOptimization',
   help: 'Request and Response Time',
