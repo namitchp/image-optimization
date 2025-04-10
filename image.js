@@ -1,8 +1,28 @@
-import multer from 'multer';
-import sharp from 'sharp';
-import * as fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+const express = require('express');
+const cors=require('cors');
+const multer = require('multer');
+const sharp = require('sharp');
+const fs = require('fs');
+const path = require('path');
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.use(cors());
+app.use(express.json());
+app.use('/uploads', express.static('uploads'));
+app.use(express.urlencoded({ extended: false }));
+
+// Sample route
+app.get('/', function (req, res) {
+    res.json({ message: 'Streaming and Image Optimization namit' });
+  });
+
+  app.use((req, res, next) => {
+    if (!req.url.startsWith('/v0')) {
+        return res.status(404).json({ error: 'Endpoint not found' });
+    }
+    next();
+  });
 class imageOptimizer {
   imageUpload() {
     const fileSize = 20; // Max file size in MB
@@ -10,7 +30,7 @@ class imageOptimizer {
       storage: multer.diskStorage({
         destination: (req, file, cb) => {
           const { folderName } = req.query;
-          const filePath = `uploads/image/original/${folderName}`;
+          const filePath = path.join(__dirname, `uploads/image/original/${folderName}`);
           if (!fs.existsSync(filePath)) fs.mkdirSync(filePath, { recursive: true });
           cb(null, filePath);
         },
@@ -26,16 +46,18 @@ class imageOptimizer {
         const mimetype = filetypes.test(file.mimetype);
         const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
         if (mimetype && extname) return cb(null, true);
-        cb('Error: File upload only supports the following filetypes - ' + filetypes);
+        cb(new Error('Error: File upload only supports the following filetypes - ' + filetypes));
       },
     });
   }
+
   imageGet(query, res) {
     const imagePath = this.fileAccess(query, res);
     return imagePath.valid
       ? this.transformedImageFun(imagePath.message, res)
       : this.originalImage(query, imagePath, res);
   }
+
   async originalImage(query, imagePath, res) {
     const { width, height, quality, format } = query;
     const formatOptions = {
@@ -74,8 +96,6 @@ class imageOptimizer {
   }
 
   fetchDirectory(type) {
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
     const imagePath = path.join(__dirname, `./uploads/image/${type}`);
     if (!fs.existsSync(imagePath)) fs.mkdirSync(imagePath, { recursive: true });
     return imagePath;
@@ -96,7 +116,7 @@ class imageOptimizer {
   }
 }
 
-export const imageOptimizationFun = (app) => {
+
   const classOptimization = new imageOptimizer();
 
   app.post(
@@ -109,20 +129,32 @@ export const imageOptimizationFun = (app) => {
     },
     classOptimization.imageUpload().single('file'),
     (req, res) => {
-      const filePath = req.file.path.split("original/")[1];
-      const fullUrl = `https://image.connectx.co.in/v0/image/get?name=${filePath}&format=auto&width=auto&height=auto&quality=auto`;
-      // const fullUrl = `https://image.quickgst.in/v0/image/get?name=${filePath}&format=auto&width=auto&height=auto&quality=auto`;
+      const filePath = req.file.path.replace(/\\/g, '/').split('original/')[1]; // Replace backslashes with forward slashes
+      const fullUrl = `https://image.quickgst.in/v0/image/get?name=${filePath}&format=auto&width=auto&height=auto&quality=auto`;
       res.status(200).json({
         message: 'Success',
-        data: `https://image.connectx.co.in/v0/image/get?name=${filePath}`,
-        // data: `https://image.quickgst.in/v0/image/get?name=${filePath}`,
+        fileName: filePath,
+        cons: req.file,
+        data: `https://image.quickgst.in/v0/image/get?name=${filePath}`,
         url: fullUrl,
       });
     }
   );
 
   app.get('/v0/image/get', (req, res) => {
-    const obj = { ...req.query, width: req.query.width || 'auto', height: req.query.height || 'auto', quality: req.query.quality || 'auto', format: req.query.format || 'auto' };
+    const obj = {
+      ...req.query,
+      width: req.query.width || 'auto',
+      height: req.query.height || 'auto',
+      quality: req.query.quality || 'auto',
+      format: req.query.format || 'auto'
+    };
     classOptimization.imageGet(obj, res);
   });
-};
+
+
+
+// Start the server
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});

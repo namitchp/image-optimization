@@ -60,6 +60,7 @@ export const ffmpeg = (app, server) => {
       const ffmpegCommand = `ffmpeg -i ${videoPath} -codec:v libx264 -codec:a aac -hls_time 20 -hls_playlist_type vod -hls_segment_filename "${outputPath}/segment%03d.ts" -start_number 0 -flush_packets 1 -fs ${MAX_SEGMENT_SIZE} -progress pipe:1 ${hlsPath}`;
       const ffmpegProcess = exec(ffmpegCommand);
 
+      // const fullUrl = `https://image.quickgst.in/${hlsPath}`;
       const fullUrl = `https://image.connectx.co.in/${hlsPath}`;
       res.json({
         message: 'Video converted to HLS format',
