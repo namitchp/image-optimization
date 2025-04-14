@@ -17,7 +17,7 @@ class imageOptimizer {
         filename: (req, file, cb) => {
           const ext = path.extname(file.originalname);
           const filename = path.basename(file.originalname, ext);
-          cb(null, `${filename}-${Date.now()}${ext}`);
+          cb(null, `${filename.replaceAll(' ', '')}-${Date.now()}${ext}`);
         },
       }),
       limits: { fileSize: 1024 * 1024 * fileSize },
@@ -123,6 +123,20 @@ export const imageOptimizationFun = (app) => {
 
   app.get('/v0/image/get', (req, res) => {
     const obj = { ...req.query, width: req.query.width || 'auto', height: req.query.height || 'auto', quality: req.query.quality || 'auto', format: req.query.format || 'auto' };
-    classOptimization.imageGet(obj, res);
+
+        const supportedFormats = ['.jpeg', '.gif', '.webp', '.png', '.avif'];
+        const fileExtension = path.extname(obj.name).toLowerCase();
+    
+        if (supportedFormats.includes(fileExtension)) {
+          classOptimization.imageGet(obj, res);
+        } else {
+          const accessFolder = `${classOptimization.fetchDirectory('original')}/${obj.name}`;
+          if (fs.existsSync(accessFolder)) {
+            classOptimization.transformedImageFun(accessFolder, res);
+          } else {
+            res.status(404).send({ message: 'File not found' });
+          }
+        }
+    // classOptimization.imageGet(obj, res);
   });
 };

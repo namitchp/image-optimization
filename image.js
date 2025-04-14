@@ -37,12 +37,12 @@ class imageOptimizer {
         filename: (req, file, cb) => {
           const ext = path.extname(file.originalname);
           const filename = path.basename(file.originalname, ext);
-          cb(null, `${filename}-${Date.now()}${ext}`);
+          cb(null, `${filename.replaceAll(' ', '')}-${Date.now()}${ext}`);
         },
       }),
       limits: { fileSize: 1024 * 1024 * fileSize },
       fileFilter: (req, file, cb) => {
-        const filetypes = /jpeg|jpg|png|pdf/;
+        const filetypes = /jpeg|jpg|png|pdf|doc|docs/;
         const mimetype = filetypes.test(file.mimetype);
         const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
         if (mimetype && extname) return cb(null, true);
@@ -133,8 +133,8 @@ class imageOptimizer {
       const fullUrl = `https://image.quickgst.in/v0/image/get?name=${filePath}&format=auto&width=auto&height=auto&quality=auto`;
       res.status(200).json({
         message: 'Success',
-        fileName: filePath,
-        cons: req.file,
+        // fileName: filePath,
+        // cons: req.file,
         data: `https://image.quickgst.in/v0/image/get?name=${filePath}`,
         url: fullUrl,
       });
@@ -147,13 +147,23 @@ class imageOptimizer {
       width: req.query.width || 'auto',
       height: req.query.height || 'auto',
       quality: req.query.quality || 'auto',
-      format: req.query.format || 'auto'
+      format: req.query.format || 'auto',
     };
-    classOptimization.imageGet(obj, res);
+
+    const supportedFormats = ['.jpeg', '.gif', '.webp', '.png', '.avif'];
+    const fileExtension = path.extname(obj.name).toLowerCase();
+
+    if (supportedFormats.includes(fileExtension)) {
+      classOptimization.imageGet(obj, res);
+    } else {
+      const accessFolder = `${classOptimization.fetchDirectory('original')}/${obj.name}`;
+      if (fs.existsSync(accessFolder)) {
+        classOptimization.transformedImageFun(accessFolder, res);
+      } else {
+        res.status(404).send({ message: 'File not found' });
+      }
+    }
   });
-
-
-
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
