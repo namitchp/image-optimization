@@ -4,6 +4,8 @@ import * as fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 class imageOptimizer {
+
+  
   imageUpload() {
     const fileSize = 20; // Max file size in MB
     return multer({
@@ -30,6 +32,7 @@ class imageOptimizer {
       },
     });
   }
+  
   imageGet(query, res) {
     const imagePath = this.fileAccess(query, res);
     return imagePath.valid
